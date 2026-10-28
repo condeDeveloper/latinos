@@ -1,0 +1,47 @@
+name: testes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  testes:
+    runs-on: ${{ matrix.so }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        so: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      # O juiz e a DEFINICAO: cada simbolo uma vez em cada linha e uma vez em cada
+      # coluna. Ele nao sabe contar, nao sabe reduzir e nao sabe o que e
+      # transversal. Ate a ordem 5 a varredura de TODOS os quadrados confere a
+      # conta n!(n-1)! que a varredura dos reduzidos usa.
+      - name: testes
+        run: dotnet test testes/Latinos.Testes/Latinos.Testes.csproj -c Release --nologo -v q
+
+      - name: quantos quadrados latinos existem
+        run: dotnet run --project ferramentas/Medidor/Medidor.csproj -c Release -- contagem
+
+      - name: a ordem 7 sozinha
+        run: dotnet run --project ferramentas/Medidor/Medidor.csproj -c Release -- sete
+
+      - name: todo retangulo latino completa
+        run: dotnet run --project ferramentas/Medidor/Medidor.csproj -c Release -- retangulos
+
+      - name: transversais, e quem nao tem nenhuma
+        run: dotnet run --project ferramentas/Medidor/Medidor.csproj -c Release -- transversais
+
+      - name: quantas celulas soltas travam
+        run: dotnet run --project ferramentas/Medidor/Medidor.csproj -c Release -- evans
+
+      - name: quem tem par ortogonal
+        run: dotnet run --project ferramentas/Medidor/Medidor.csproj -c Release -- ortogonais
